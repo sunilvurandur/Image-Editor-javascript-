@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script src="jquery.min.js"></script>
+<script src="fabric.min.js"></script>
+<script src="FileSaver.min.js"></script>
+<script src="canvas-toBlob.js"></script>
+<style>
+
+
+</style>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <input type="file" id="imgLoader">
+
+        <center><canvas id="c" style="border: 2px solid black;background-size:430px 480px;" width="500" height="480"></canvas></center>
+        <input id="b" type="button" value="Save as Image" />
+        <button id="add" type="button">add</button>
+        <!--text parameters-->
+        <textarea id="text-cont"></textarea>
+        <select class="select2 font-change" data-type="fontFamily">
+          <option value="Arial">Arial</option>
+          <option value="Arial Black">Arial Black</option>
+          <option value="Impact">Impact</option>
+          <option value="Tahoma">Tahoma</option>
+          <option value="Times New Roman">Times New Roman</option>
+        </select>
+        <select class="select2 font-change" data-type="fontSize">
+          <option value="10">10</option>
+          <option value="12">12</option>
+          <option value="14">14</option>
+          <option value="16">16</option>
+          <option value="18">18</option>
+          <option value="20">20</option>
+          <option value="24">24</option>
+          <option value="32">32</option>
+        </select>
+        <select class="select2 font-change" data-type="color">
+          <option value="#000">#000</option>
+          <option value="#00f">#00f</option>
+          <option value="#0f0">#0f0</option>
+          <option value="#f00">#f00</option>
+        </select>
+        <select class="select2 font-change" data-type="textAlign">
+          <option value="left">left</option>
+          <option value="center">center</option>
+          <option value="right">right</option>
+        </select>
+
+
+
+<script>
+
+    canvas = new fabric.Canvas('c');
+
+document.getElementById('imgLoader').onchange = function handleImage(e) {
+    var reader = new FileReader();
+    reader.onload = function (event) { console.log('fdsf');
+        var imgObj = new Image();
+         var image= new Image();
+        imgObj.src = event.target.result;
+        imgObj.onload = function () {
+
+            var image = new fabric.Image(imgObj);
+            image.set({
+                left: 20,
+                setWidth: 200,
+                setHeight: 200,
+                top: 10,
+                angle: 0,
+                padding: 10,
+                cornersize: 50,
+            });
+
+            image.scaleToWidth(500);
+            image.scaleToHeight(500);
+
+
+            canvas.add(image);
+
+
+        }
+
+    }
+    reader.readAsDataURL(e.target.files[0]);
+}
+document.getElementById("c").style.background = "url('case.jpg')";
+document.getElementById("c").style.backgroundSize = "420px 470px";
+
+$("#b").click(function(){
+$("#c").get(0).toBlob(function(blob){
+saveAs(blob, "myIMG.jpg");
+});
+});
+
+
+</script>
+<script>
+var imageLoader = document.getElementById('imageLoader');
+canvas.uniScaleTransform = true;
+
+var appObject = function() {
+
+  return {
+    __canvas: canvas,
+    __tmpgroup: {},
+
+    addText: function() {
+      var newID = (new Date()).getTime().toString().substr(5);
+      var text = new fabric.IText('текст', {
+        fontFamily: 'arial black',
+        left: 100,
+        top: 100,
+        myid: newID,
+        objecttype: 'text'
+      });
+
+      this.__canvas.add(text);
+      this.addLayer(newID, 'text');
+    },
+    setTextParam: function(param, value) {
+      var obj = this.__canvas.getActiveObject();
+      if (obj) {
+        if (param == 'color') {
+          obj.setColor(value);
+        } else {
+          obj.set(param, value);
+        }
+        this.__canvas.renderAll();
+      }
+    },
+    setTextValue: function(value) {
+      var obj = this.__canvas.getActiveObject();
+      if (obj) {
+        obj.setText(value);
+        this.__canvas.renderAll();
+      }
+    },
+    addLayer: function() {
+
+    }
+
+  };
+}
+
+$(document).ready(function() {
+
+  var app = appObject();
+
+  $('.font-change').change(function(event) {
+    app.setTextParam($(this).data('type'), $(this).find('option:selected').val());
+  });
+
+  $('#add').click(function() {
+    app.addText();
+  });
+  $('#text-cont').keyup(function() {
+    app.setTextValue($(this).val());
+  })
+
+})
+</script>
+
+  </body>
+</html>
